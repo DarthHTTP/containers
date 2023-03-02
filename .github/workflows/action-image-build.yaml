@@ -46,6 +46,11 @@ jobs:
         image: ["${{ fromJson(inputs.imagesToBuild) }}"]
       fail-fast: false
     steps:
+      - name: set lower case owner name
+        run: |
+          echo "OWNER_LC=${OWNER,,}" >>${GITHUB_ENV}
+        env:
+          OWNER: "${{ github.repository_owner }}"
       - uses: actions/checkout@v3
         with:
           fetch-depth: 1
@@ -140,7 +145,7 @@ jobs:
           platforms: linux/amd64 # load does not support muti-arch https://github.com/docker/buildx/issues/290
           file: ${{ steps.vars.outputs.chan_dockerfile }}
           load: true
-          tags: ghcr.io/${{ github.repository_owner }}/${{ steps.vars.outputs.chan_tag_testing }}
+          tags: ghcr.io/${{ OWNER_LC }}/${{ steps.vars.outputs.chan_tag_testing }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -155,7 +160,7 @@ jobs:
           GOSS_SLEEP: 2
           GOSS_FILES_STRATEGY: cp
           CONTAINER_LOG_OUTPUT: goss_container_log_output
-        run: dgoss run ghcr.io/${{ github.repository_owner }}/${{ steps.vars.outputs.chan_tag_testing }} ${{ steps.vars.outputs.chan_goss_args }}
+        run: dgoss run ghcr.io/${{ OWNER_LC }}/${{ steps.vars.outputs.chan_tag_testing }} ${{ steps.vars.outputs.chan_goss_args }}
 
       - name: Build all platforms
         id: release
@@ -178,8 +183,8 @@ jobs:
           file: ${{ steps.vars.outputs.chan_dockerfile }}
           push: ${{ inputs.pushImages == 'true' }}
           tags: |-
-            ghcr.io/${{ github.repository_owner }}/${{ steps.vars.outputs.chan_tag_rolling }}
-            ghcr.io/${{ github.repository_owner }}/${{ steps.vars.outputs.chan_tag_version }}
+            ghcr.io/${{ OWNER_LC }}/${{ steps.vars.outputs.chan_tag_rolling }}
+            ghcr.io/${{ OWNER_LC }}/${{ steps.vars.outputs.chan_tag_version }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
