@@ -98,7 +98,7 @@ jobs:
               echo "chan_tag_version=${{ matrix.image.app }}-${{ matrix.image.channel }}:${chan_upstream_version}" >> $GITHUB_OUTPUT
           fi
 
-          echo "repository_owner_lc=${ github.repository_owner,, }" >> ${GITHUB_OUTPUT}
+          echo "repository_owner_lc=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]') >> ${GITHUB_OUTPUT}
 
       - name: Setup Tools
         shell: bash
